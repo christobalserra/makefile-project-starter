@@ -8,62 +8,93 @@
 
 #ifndef LAB_H
 #define LAB_H
-
 #include <stdlib.h>
+#include <stdbool.h>
 
-/**
- * @struct Node
- * @brief Represents a node in the circular doubly linked list.
- *
- * Each node stores a pointer to an integer value, along with pointers to 
- * the next and previous nodes in the list.
- */
-typedef struct Node {
-    int* data;          // information stored in node
-    struct Node* next;  // pointer to the next node
-    struct Node* prev;  // pointer to the previous node
-} Node;
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-/**
- * @struct List
- * @brief Represents a circular doubly linked list.
- *
- * The list contains a sentinel node, which acts as a dummy node to 
- * simplify insertion and deletion by avoiding special cases for the head 
- * and tail.
- */
-typedef struct List {
-    Node* sentinel; // Sentinel node to simplify list operations
-} List;
+    /**
+     * @brief A node in the list
+     *
+     */
+    typedef struct node
+    {
+        void *data;
+        struct node *next;
+        struct node *prev;
+    } node_t;
 
-/**
- * @brief Creates and initializes an empty circular doubly linked list.
- * @return Pointer to the newly created list.
- */
-List* create_list();
+    /**
+    * @brief Struct to represent a list. The list maintains 2 function pointers to help
+    * with the management of the data it is storing. These functions must be provided by the
+    * user of this library.
+    */
+    typedef struct list
+    {
+        void (*destroy_data)(void *);                  /*free's any memory that data allocated*/
+        int (*compare_to)(const void *, const void *); /* returns 0 if data are the same*/
+        size_t size;                                   /* How many elements are in the list */
+        struct node *head;                             /* sentinel node*/
+    } list_t;
 
-/**
- * @brief Creates and adds a new node with the given data to the list.
- * @param list Pointer to the list.
- * @param data Pointer to the integer data to store in the new node.
- */
-void list_add_node(List* list, int* data);
+    /**
+    * @brief Create a new list with callbacks that know how to deal with the data that
+    * list is storing. The caller must pass the list to list_destroy when finished to
+    * free any memory that was allocated.
+    *
+    * @param destroy_data Function that will free the memory for user supplied data
+    * @param compare_to Function that will compare two user data elements
+    * @return struct list* pointer to the newly allocated list.
+    */
+    list_t *list_init(void (*destroy_data)(void *),
+                                 int (*compare_to)(const void *, const void *));
 
-/**
- * @brief Removes a specified node from the list.
- * @param list Pointer to the list.
- * @param node Pointer to the node to remove.
- * @return Pointer to the removed node, or NULL if the node is invalid.
- */
-Node* list_remove(List* list, Node* node);
+    /**
+     * @brief Destroy the list and and all associated data. This functions will call
+     * destroy_data on each nodes data element.
+     *
+     * @param list a pointer to the list that needs to be destroyed
+     */
+    void list_destroy(list_t **list);
 
-/**
- * @brief Destroys the list and frees all allocated memory.
- * @param list Pointer to the list to destroy.
- */
-void list_destroy(List* list);
+    /**
+     * Adds data to the front of the list
+     *
+     * @param list a pointer to an existing list.
+     * @param data the data to add
+     * @return A pointer to the list
+     */
+    list_t *list_add(list_t *list, void *data);
 
-// Node* list_get_first(List* list);
-// Node* list_get_last(List* list);
+    /**
+     * @brief Removes the data at the specified index. If index is invalid
+     * then this function does nothing and returns NULL
+     *
+     * @param list The list to remove the element from
+     * @param index The index
+     * @return void* The data that was removed or NULL if nothing was removed
+     */
+    void *list_remove_index(list_t *list, size_t index);
+
+    /**
+     * @brief Search for any occurrence of data from the list.
+     * Internally this function will call compare_to on each item in the list
+     * until a match is found or the end of the list is reached. If there are
+     * multiple copies of the same data in the list the first one will be returned.
+     *
+     * @param list the list to search for data
+     * @param data the data to look for
+     * @return The index of the item if found or -1 if not
+     */
+    int list_indexof(list_t *list, void *data);
+
+
+
+#ifdef __cplusplus
+} //extern "C"
+#endif
 
 #endif
