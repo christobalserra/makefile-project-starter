@@ -242,6 +242,37 @@ void test_notInList(void)
   free(data);
 }
 
+void test_add_multiple(void) {
+  for (int i = 1; i <= 3; i++) {
+    list_add(lst_, alloc_data(i));
+  }
+  TEST_ASSERT_TRUE(lst_->size == 3);
+  TEST_ASSERT_TRUE(*((int *)lst_->head->next->data) == 3);
+  TEST_ASSERT_TRUE(*((int *)lst_->head->next->next->data) == 2);
+  TEST_ASSERT_TRUE(*((int *)lst_->head->next->next->next->data) == 1);
+}
+
+void test_remove_last_element(void) {
+  populate_list();
+  int *rval = (int *)list_remove_index(lst_, 4);
+  TEST_ASSERT_TRUE(lst_->size == 4);
+  TEST_ASSERT_TRUE(*rval == 0);
+  free(rval);
+}
+
+void test_remove_middle_element(void) {
+  populate_list();
+  int *rval = (int *)list_remove_index(lst_, 2);
+  TEST_ASSERT_TRUE(lst_->size == 4);
+  TEST_ASSERT_TRUE(*rval == 2);
+  free(rval);
+}
+
+void test_empty_list_remove(void) {
+  void *rval = list_remove_index(lst_, 0);
+  TEST_ASSERT_TRUE(rval == NULL);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_create_destroy);
@@ -255,5 +286,11 @@ int main(void) {
   RUN_TEST(test_indexOf0);
   RUN_TEST(test_indexOf3);
   RUN_TEST(test_notInList);
+  
+  RUN_TEST(test_add_multiple);
+  RUN_TEST(test_remove_last_element);
+  RUN_TEST(test_remove_middle_element);
+  RUN_TEST(test_empty_list_remove);
+  
   return UNITY_END();
 }
