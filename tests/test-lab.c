@@ -1,21 +1,112 @@
+
 #include "harness/unity.h"
 #include "../src/lab.h"
 
+List* list;
+
+Node* add_data(List* list, int data) {
+    list_add_node(list, &data);
+    return list->sentinel->previous; // Return new node (which is always the one before sentinel)
+}
 
 void setUp(void) {
-  // set stuff up here
+    list = create_list();
 }
 
 void tearDown(void) {
-  // clean stuff up here
+    list_destroy(list);
 }
 
-void test_stuff(void){
-  // test stuff here
+void test_create_list(void) {
+    TEST_ASSERT_NOT_NULL(list);  // list is created and is not NULL
+    TEST_ASSERT_NOT_NULL(list->sentinel);  // sentinel node is created and is not NULL
+    // List is empty, so...
+    TEST_ASSERT_EQUAL_PTR(list->sentinel->next, list->sentinel);  // sentinel's next is self
+    TEST_ASSERT_EQUAL_PTR(list->sentinel->prev, list->sentinel);  // sentinel's prev is self
+}
+
+void test_add1(void) {
+    int data = 42; // data to add, meaning of life
+    Node* new_node = add_data(list, &data); // get the new node from the sentinel
+
+    TEST_ASSERT_NOT_EQUAL(new_node, list->sentinel); // new node is not sentinel
+    TEST_ASSERT_EQUAL_PTR(new_node->data, &data); // new node has the data pointer we want.
+}
+
+void test_add2(void) {
+    int data1 = 1;
+    int data2 = 2;
+    Node* first_node = add_data(list, &data1);
+    Node* second_node = add_data(list, &data2);
+
+    TEST_ASSERT_NOT_EQUAL(first_node, second_node); // different nodes
+    TEST_ASSERT_EQUAL_PTR(first_node->data, &data1); // first node has first data
+    TEST_ASSERT_EQUAL_PTR(second_node->data, &data2); // second node has second data
+}
+
+void test_remove_empty(void) {
+    // Empty list
+    Node* removed_node = list_remove(list, list->sentinel->next);
+    TEST_ASSERT_NULL(removed_node);  // No node should be removed (since the list is empty)
+}
+
+void test_remove1(void) {
+    // Add the node, so we can remove it after.
+    int data = 9;
+    Node* new_node = add_data(list, &data);
+    // Do the removal.
+    list_remove(list, new_node);
+
+    TEST_ASSERT_EQUAL_PTR(list->sentinel->next, list->sentinel);  // list is empty again
+}
+
+void test_remove2(void) {
+    int data1 = 10;
+    int data2 = 20;
+    Node* first_node = add_data(list, &data1);
+    Node* second_node = add_data(list, &data2);
+
+    // Remove the first node and test.
+    Node* removed_node = list_remove(list, first_node);
+    TEST_ASSERT_EQUAL_PTR(removed_node, first_node);  // Correct node is removed
+    TEST_ASSERT_EQUAL_PTR(list->sentinel->next, second_node);  // Second node is now the first node
+    TEST_ASSERT_EQUAL_PTR(second_node->next, list->sentinel);  // Second node points to sentinel
+
+    // TODO - add again and remove the second one this time.
+}
+
+void test_remove3(void) {
+    int data1 = 7;
+    int data2 = 8;
+    int data3 = 9;
+    Node* first_node = add_data(list, &data1);
+    Node* second_node = add_data(list, &data2);
+    Node* third_node = add_data(list, &data3);
+
+    // Remove the first node and test.
+    Node* removed_node = list_remove(list, first_node);
+    TEST_ASSERT_EQUAL_PTR(removed_node, first_node);  // Correct node is removed
+    TEST_ASSERT_EQUAL_PTR(list->sentinel->next, second_node);  // Second node is now the first
+    TEST_ASSERT_EQUAL_PTR(second_node->next, third_node);  // Second node points to third node
+    TEST_ASSERT_EQUAL_PTR(third_node->next, list->sentinel);  // Third node points to sentinel
+
+    // TODO - add back and remove middle
+    // TODO - add back and remove third
+}
+
+void test_list_destroy(void) {
+    list_destroy(list);
+    // TODO - There should be no memory leaks with valgrind or makefile. Check for that.
 }
 
 int main(void) {
-  UNITY_BEGIN();
-  RUN_TEST(test_stuff);
-  return UNITY_END();
+    UNITY_BEGIN();
+    RUN_TEST(test_create_list);
+    RUN_TEST(test_add1);
+    RUN_TEST(test_add2);
+    RUN_TEST(test_remove1);
+    RUN_TEST(test_remove2);
+    RUN_TEST(test_remove3);
+    RUN_TEST(test_list_destroy);
+    return UNITY_END();
 }
