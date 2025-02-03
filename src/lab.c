@@ -58,7 +58,7 @@ void list_destroy(list_t **list) {
     node_t *current = (*list)->head->next;
     while (current != (*list)->head) {
         node_t *nxt = current->next; 
-        // Free stored data if provided, using builtin function for init.
+        // Free data before deallocating the node.
         if ((*list)->destroy_data && current->data) {
             (*list)->destroy_data(current->data);
         }
@@ -115,7 +115,7 @@ void *list_remove_index(list_t *list, size_t index) {
     if (!list || index >= list->size) {
         return NULL;
     }
-    // Iterate through the list to find the node in the list. 
+    // Iterate through the list to find the node at the given index.
     node_t *current = list->head->next;
     for (size_t i = 0; i < index; i++) {
         current = current->next;
