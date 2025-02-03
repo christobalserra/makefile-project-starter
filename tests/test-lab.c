@@ -242,6 +242,9 @@ void test_notInList(void)
   free(data);
 }
 
+/**
+ * @brief Test adding multiple elements to the list.
+ */
 void test_add_multiple(void) {
   for (int i = 1; i <= 3; i++) {
     list_add(lst_, alloc_data(i));
@@ -252,6 +255,9 @@ void test_add_multiple(void) {
   TEST_ASSERT_TRUE(*((int *)lst_->head->next->next->next->data) == 1);
 }
 
+/**
+ * @brief Test removing the last element in the list.
+ */
 void test_remove_last_element(void) {
   populate_list();
   int *rval = (int *)list_remove_index(lst_, 4);
@@ -260,6 +266,9 @@ void test_remove_last_element(void) {
   free(rval);
 }
 
+/**
+ * @brief Test removing a middle element from the list.
+ */
 void test_remove_middle_element(void) {
   populate_list();
   int *rval = (int *)list_remove_index(lst_, 2);
@@ -268,6 +277,9 @@ void test_remove_middle_element(void) {
   free(rval);
 }
 
+/**
+ * @brief Test attempting to remove an element from an empty list.
+ */
 void test_empty_list_remove(void) {
   void *rval = list_remove_index(lst_, 0);
   TEST_ASSERT_TRUE(rval == NULL);
@@ -287,6 +299,7 @@ int main(void) {
   RUN_TEST(test_indexOf3);
   RUN_TEST(test_notInList);
   
+  // New tests
   RUN_TEST(test_add_multiple);
   RUN_TEST(test_remove_last_element);
   RUN_TEST(test_remove_middle_element);
