@@ -6,16 +6,6 @@
  * forward or back, and loops back around to itself.
  * 
  */
-/**
- * @file lab.c
- * @brief Implementation of a circular doubly linked list.
- *
- * A circular doubly linked list is a linked list that can be iterated 
- * forward or back, and loops back around to itself.
- * 
- * This implementation adds new nodes to the front of the list,
- * but may be extended in the future.
- */
 
 #include "lab.h"
 #include <stdio.h>
