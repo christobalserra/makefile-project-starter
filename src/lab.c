@@ -57,9 +57,14 @@ void list_destroy(list_t **list) {
     // Iterate through list to clean-up each node in it.
     node_t *current = (*list)->head->next;
     while (current != (*list)->head) {
-        node_t *temp = current; // temporary node
-        current = current->next; // advance
-        free(temp);
+        node_t *nxt = current->next; 
+        // Free stored data if provided, using builtin function for init.
+        if ((*list)->destroy_data && current->data) {
+            (*list)->destroy_data(current->data);
+        }
+        // Advance
+        free(current);
+        current = nxt; 
     }
     // List memory clean-up.
     free((*list)->head);
